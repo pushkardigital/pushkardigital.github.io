@@ -472,6 +472,96 @@
             .btn-contact span { display: none; }
             .btn-contact { padding: 0.65rem; border-radius: 50%; }
         }
+
+        /* for New Services */
+
+
+
+
+        /* Card Container Layout */
+.service-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+/* Individual Card Design */
+.service-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 24px;
+  width: 300px; /* Ya grid flex status ke hisaab se */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+/* Card Hover State */
+.service-card:hover {
+  border-color: #2563eb;
+  box-shadow: 0 8px 24px rgba(37, 99, 235, 0.12);
+  transform: translateY(-2px);
+}
+
+/* Icon Box */
+.service-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+  background-color: #e0e7ff;
+  color: #2563eb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+  font-size: 20px;
+}
+
+/* Title & Text */
+.service-card h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #0f172a;
+  margin-bottom: 8px;
+}
+
+.service-card p {
+  font-size: 14px;
+  color: #64748b;
+  line-height: 1.5;
+  margin-bottom: 20px;
+}
+
+/* Button Styling */
+.visit-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 18px;
+  background-color: #f8fafc;
+  color: #0f172a;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 14px;
+  border: 1px solid #e2e8f0;
+  transition: all 0.2s ease;
+}
+
+/* Active / Hover Button */
+.service-card:hover .visit-btn,
+.visit-btn:hover {
+  background-color: #2563eb;
+  color: #ffffff;
+  border-color: #2563eb;
+}
+
+
+              
     </style>
 </head>
 <body>
@@ -656,6 +746,26 @@
             </div>
         </div>
     </div>
+    <!-- For New Service -->
+
+    <!-- New Service Card -->
+<div class="service-card">
+  <!-- Icon (Aap FontAwesome ya SVG use kar sakte hain) -->
+  <div class="service-icon">
+    <i class="fas fa-external-link-alt"></i>
+  </div>
+
+  <!-- Title -->
+  <h3>Nayi Service Ka Naam</h3>
+
+  <!-- Description -->
+  <p>Yahan service ki thodi detail aur jankari likhein.</p>
+
+  <!-- Portal Link Button -->
+  <a href="https://eproc.up.gov.in/paddy2324/Uparjan/FarmerRegLogin.aspx" target="_blank" class="visit-btn">
+    Visit Portal <i class="fas fa-chevron-right"></i>
+  </a>
+</div>
 
     <!-- JavaScript Logic -->
     <script>
