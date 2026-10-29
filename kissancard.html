@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agri Card Generator - Pushkar Digital Solutions</title>
+  
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- QRCode.js Library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Mukta:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --primary-green: #0a5223;
+      --accent-green: #15803d;
+      --light-green: #eef2eb;
+      --border-color: #cbd5e1;
+      --text-dark: #1e293b;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Poppins', 'Mukta', sans-serif;
+    }
+
+    body {
+      background-color: #f1f5f9;
+      color: var(--text-dark);
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    /* Form Styling */
+    .form-card {
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      margin-bottom: 30px;
+    }
+
+    .form-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--primary-green);
+      margin-bottom: 20px;
+      border-bottom: 2px solid var(--light-green);
+      padding-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .grid-form {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .form-group.full-width {
+      grid-column: 1 / -1;
+    }
+
+    label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #475569;
+    }
+
+    input, select {
+      padding: 8px 12px;
+      border: 1.5px solid var(--border-color);
+      border-radius: 6px;
+      font-size: 0.9rem;
+      outline: none;
+      transition: all 0.2s;
+    }
+
+    input:focus, select:focus {
+      border-color: var(--primary-green);
+      box-shadow: 0 0 0 3px rgba(10, 82, 35, 0.15);
+    }
+
+    .btn-action {
+      background: var(--primary-green);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      border-radius: 8px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: background 0.2s;
+    }
+
+    .btn-action:hover {
+      background: #073a18;
+    }
+
+    .btn-secondary {
+      background: #0284c7;
+      color: white;
+    }
+
+    .btn-secondary:hover {
+      background: #0369a1;
+    }
+
+    .btn-danger {
+      background: #ef4444;
+      color: white;
+      padding: 4px 8px;
+      font-size: 0.75rem;
+      border-radius: 4px;
+      border: none;
+      cursor: pointer;
+    }
+
+    /* Print Controls */
+    .controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      background: white;
+      padding: 15px 20px;
+      border-radius: 8px;
+    }
+
+    /* Dynamic Land Table Form */
+    .land-form-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+
+    .land-form-table th, .land-form-table td {
+      border: 1px solid var(--border-color);
+      padding: 6px;
+      font-size: 0.8rem;
+    }
+
+    .land-form-table input {
+      width: 100%;
+      padding: 4px 6px;
+      font-size: 0.8rem;
+    }
+
+    /* -------------------------------------------------------------
+       CARD ROW (Exact 18cm x 6cm total: 9cm Front + 9cm Back)
+    ------------------------------------------------------------- */
+    .card-preview-wrapper {
+      display: flex;
+      justify-content: center;
+      overflow-x: auto;
+      padding: 10px;
+    }
+
+    .card-row {
+      width: 18cm;
+      height: 6cm;
+      display: flex;
+      flex-direction: row;
+      background: white;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+      border-radius: 4px;
+      overflow: hidden;
+      box-sizing: border-box;
+      position: relative;
+    }
+
+    .card-side {
+      width: 9cm;
+      height: 6cm;
+      position: relative;
+      background: #ffffff;
+      box-sizing: border-box;
+      overflow: hidden;
+      font-family: 'Mukta', sans-serif;
+    }
+
+    .card-side.front {
+      border-right: 1px dashed #cbd5e1;
+    }
+
+    /* --- FRONT CARD STYLING --- */
+    .front-top-bar {
+      background-color: #0b4a22;
+      color: #ffffff;
+      text-align: center;
+      font-size: 7.5px;
+      font-weight: 700;
+      padding: 1px 0;
+      letter-spacing: 0.3px;
+    }
+
+    .front-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 2px 6px 0px 6px;
+      height: 25px;
+    }
+
+    .emblem-box {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .emblem-img {
+      height: 20px;
+      width: auto;
+    }
+
+    .agri-logo-text {
+      display: flex;
+      align-items: center;
+      line-height: 1;
+    }
+
+    .agri-logo-text .agri {
+      font-family: 'Poppins', sans-serif;
+      font-size: 13px;
+      font-weight: 800;
+      color: #0b4a22;
+    }
+
+    .agri-logo-text .leaf-icon {
+      color: #22c55e;
+      font-size: 10px;
+      margin: 0 1px;
+    }
+
+    .agri-logo-text .card {
+      font-family: 'Poppins', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      color: #eab308;
+      margin-left: 2px;
+    }
+
+    .front-title-hindi {
+      font-size: 12px;
+      font-weight: 800;
+      color: #0b4a22;
+      border-bottom: 1px solid #15803d;
+      padding-bottom: 0px;
+      line-height: 1.1;
+    }
+
+    .top-right-leaf {
+      height: 18px;
+    }
+
+    .front-content {
+      display: flex;
+      padding: 4px 6px;
+      gap: 6px;
+      margin-top: 1px;
+    }
+
+    .photo-box {
+      width: 2.1cm;
+      height: 2.7cm;
+      border: 1px solid #0b4a22;
+      border-radius: 6px;
+      overflow: hidden;
+      background: #e2e8f0;
+      flex-shrink: 0;
+      box-shadow: inset 0 0 4px rgba(0,0,0,0.1);
+    }
+
+    .photo-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .details-box {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      gap: 2px;
+    }
+
+    .farmer-name-en {
+      font-size: 9px;
+      font-weight: 800;
+      color: #000000;
+      line-height: 1.1;
+    }
+
+    .farmer-name-hi {
+      font-size: 8.5px;
+      font-weight: 800;
+      color: #0b4a22;
+      line-height: 1.1;
+      margin-bottom: 3px;
+    }
+
+    .detail-row {
+      display: flex;
+      font-size: 6.8px;
+      line-height: 1.25;
+      color: #1e293b;
+    }
+
+    .detail-label {
+      width: 44px;
+      font-weight: 800;
+      color: #0b4a22;
+    }
+
+    .detail-colon {
+      margin-right: 3px;
+      font-weight: 800;
+    }
+
+    .detail-value {
+      font-weight: 700;
+      color: #000;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .qr-box {
+      width: 1.7cm;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      margin-top: 2px;
+    }
+
+    .qr-code-container {
+      width: 1.6cm;
+      height: 1.6cm;
+      background: #fff;
+      padding: 1px;
+      border: 1px solid #e2e8f0;
+      border-radius: 2px;
+    }
+
+    .qr-code-container img {
+      width: 100% !important;
+      height: 100% !important;
+    }
+
+    /* Bottom Section Front */
+    .front-bottom {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 38px;
+      pointer-events: none;
+    }
+
+    .leaf-graphic-left {
+      position: absolute;
+      left: -2px;
+      bottom: -2px;
+      height: 34px;
+      z-index: 2;
+    }
+
+    .pill-id-box {
+      position: absolute;
+      bottom: 12px;
+      left: 50%;
+      transform: translateX(-40%);
+      background: #ffffff;
+      border: 1px solid #0b4a22;
+      border-radius: 12px;
+      padding: 0px 8px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      z-index: 3;
+      height: 14px;
+    }
+
+    .pill-icon {
+      width: 10px;
+      height: 10px;
+      background: #0b4a22;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 6px;
+    }
+
+    .pill-text {
+      font-size: 7px;
+      font-weight: 800;
+      color: #0b4a22;
+      letter-spacing: 0.2px;
+    }
+
+    .tagline-bar {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background: linear-gradient(90deg, #0b4a22 0%, #15803d 100%);
+      color: #ffffff;
+      text-align: right;
+      padding-right: 8px;
+      font-size: 6.5px;
+      font-weight: 700;
+      line-height: 11px;
+      height: 11px;
+    }
+
+    /* --- BACK CARD STYLING (EXTENDED FULL HEIGHT) --- */
+    .card-side.back {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    .back-header {
+      background: #0b4a22;
+      color: #ffffff;
+      text-align: center;
+      padding: 2px 0;
+      flex-shrink: 0;
+    }
+
+    .back-header-title {
+      font-size: 8px;
+      font-weight: 700;
+      line-height: 1;
+    }
+
+    .back-header-id {
+      font-size: 9px;
+      font-weight: 800;
+      color: #4ade80;
+      letter-spacing: 0.5px;
+      line-height: 1.1;
+    }
+
+    .back-address {
+      padding: 3px 6px;
+      font-size: 7px;
+      font-weight: 700;
+      color: #1e293b;
+      border-bottom: 1px solid #e2e8f0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      flex-shrink: 0;
+    }
+
+    .land-details-title {
+      font-size: 8px;
+      font-weight: 800;
+      color: #0b4a22;
+      padding: 3px 6px 2px 6px;
+      flex-shrink: 0;
+    }
+
+    .table-container {
+      padding: 0 4px 4px 4px;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .land-table {
+      width: 100%;
+      height: 100%;
+      border-collapse: collapse;
+      font-size: 6px;
+      text-align: center;
+    }
+
+    .land-table th, .land-table td {
+      border: 0.5px solid #0b4a22;
+      padding: 3px 1px;
+      line-height: 1.1;
+    }
+
+    .land-table th {
+      background-color: #f8fafc;
+      font-weight: 800;
+      color: #0b4a22;
+      font-size: 6.5px;
+    }
+
+    .land-table td {
+      font-weight: 700;
+      color: #000;
+    }
+
+    /* Print Setup for A4 */
+    @media print {
+      body {
+        background: none;
+        padding: 0;
+        margin: 0;
+      }
+      .form-card, .controls, .form-title {
+        display: none !important;
+      }
+      .container {
+        max-width: 100%;
+        margin: 0;
+      }
+      .card-preview-wrapper {
+        padding: 0;
+        margin: 0;
+      }
+      .card-row {
+        box-shadow: none;
+        border: 0.5px solid #ccc;
+        page-break-inside: avoid;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  
+  <!-- FORM CARD -->
+  <div class="form-card">
+    <div class="form-title">
+      <i class="fa-solid fa-id-card"></i> Agri Card / Kisan ID Details Form
+    </div>
+    
+    <div class="grid-form">
+      <div class="form-group">
+        <label>Farmer Name (English)</label>
+        <input type="text" id="in-name-en" value="Ramnaresh Chaudhari" oninput="updateCard()">
+      </div>
+      <div class="form-group">
+        <label>Farmer Name (Hindi)</label>
+        <input type="text" id="in-name-hi" value="रामनरेश चौधरी" oninput="updateCard()">
+      </div>
+      <div class="form-group">
+        <label>DOB (DD/MM/YYYY)</label>
+        <input type="text" id="in-dob" value="01/01/1927" oninput="updateCard()">
+      </div>
+      <div class="form-group">
+        <label>Gender</label>
+        <select id="in-gender" onchange="updateCard()">
+          <option value="Male" selected>Male</option>
+          <option value="Female">Female</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Mobile Number</label>
+        <input type="text" id="in-mobile" value="7070393730" oninput="updateCard()">
+      </div>
+      <div class="form-group">
+        <label>State</label>
+        <input type="text" id="in-state" value="BIHAR" oninput="updateCard()">
+      </div>
+      <div class="form-group">
+        <label>District</label>
+        <input type="text" id="in-district" value="SAMASTIPUR" oninput="updateCard()">
+      </div>
+      <div class="form-group">
+        <label>Farmer ID / Kisan ID</label>
+        <input type="text" id="in-farmer-id" value="36565207294" oninput="updateCard()">
+      </div>
+      <div class="form-group">
+        <label>Aadhar Number</label>
+        <input type="text" id="in-aadhar" value="[Aadhaar Redacted]" oninput="updateCard()">
+      </div>
+      <div class="form-group">
+        <label>Enrollment ID (Back Banner)</label>
+        <input type="text" id="in-enroll-id" value="10_217_1284_236194_005001" oninput="updateCard()">
+      </div>
+      <div class="form-group full-width">
+        <label>Full Address</label>
+        <input type="text" id="in-address" value="yadu paran, ward no. 14, Kalyanpur, Samastipur, Bihar-848302" oninput="updateCard()">
+      </div>
+      <div class="form-group full-width">
+        <label>Farmer Photo Upload</label>
+        <input type="file" id="in-photo" accept="image/*" onchange="loadPhoto(event)">
+      </div>
+    </div>
+
+    <!-- Dynamic Land Table Management -->
+    <div style="margin-top: 25px; display: flex; justify-content: space-between; align-items: center;">
+      <div style="font-weight: 700; color: var(--primary-green); font-size: 0.95rem;">
+        <i class="fa-solid fa-map-location-dot"></i> Land Ownership Details (Multiple Khet Details)
+      </div>
+      <button class="btn-action btn-secondary" onclick="addLandRow()">
+        <i class="fa-solid fa-plus"></i> Add New Land Row
+      </button>
+    </div>
+    
+    <table class="land-form-table">
+      <thead>
+        <tr>
+          <th>Sub District</th>
+          <th>Village</th>
+          <th>SNo.</th>
+          <th>Area (Ha)</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody id="land-form-body">
+        <!-- Initial Dynamic Row -->
+      </tbody>
+    </table>
+  </div>
+
+  <!-- CONTROL BUTTONS -->
+  <div class="controls">
+    <div style="font-weight: 700; color: #334155;">
+      Card Print Output Size: <span style="color: var(--primary-green);">18 cm x 6 cm (Front + Back Row)</span>
+    </div>
+    <button class="btn-action" onclick="window.print()">
+      <i class="fa-solid fa-print"></i> Print A4 Card
+    </button>
+  </div>
+
+  <!-- CARD PREVIEW ROW (Exact 18cm x 6cm) -->
+  <div class="card-preview-wrapper">
+    <div class="card-row" id="printableCard">
+      
+      <!-- ================= FRONT SIDE (9cm x 6cm) ================= -->
+      <div class="card-side front">
+        <div class="front-top-bar">
+          भारत सरकार | कृषि एवं किसान कल्याण विभाग
+        </div>
+        
+        <div class="front-header">
+          <div class="emblem-box">
+            <!-- Ashoka Emblem SVG -->
+            <svg class="emblem-img" viewBox="0 0 100 140" fill="#0b4a22">
+              <path d="M50 10 C35 10 30 25 30 40 C30 55 40 65 50 70 C60 65 70 55 70 40 C70 25 65 10 50 10 Z"/>
+              <rect x="25" y="75" width="50" height="8" rx="2"/>
+              <path d="M30 88 L70 88 L65 110 L35 110 Z"/>
+              <rect x="20" y="115" width="60" height="10" rx="3"/>
+            </svg>
+            <div class="agri-logo-text">
+              <span class="agri">Agri</span>
+              <i class="fa-solid fa-leaf leaf-icon"></i>
+              <span class="card">Card</span>
+            </div>
+          </div>
+          
+          <div class="front-title-hindi">
+            मेरा किसान कार्ड
+          </div>
+
+          <!-- Top Leaf SVG Graphic -->
+          <svg class="top-right-leaf" viewBox="0 0 60 40" fill="#22c55e">
+            <path d="M10 30 Q 30 5 55 10 Q 30 25 10 30 Z"/>
+            <path d="M5 20 Q 20 2 40 8 Q 20 18 5 20 Z" fill="#15803d"/>
+          </svg>
+        </div>
+
+        <div class="front-content">
+          <div class="photo-box">
+            <img id="out-photo" src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=200" alt="Farmer Photo">
+          </div>
+
+          <div class="details-box">
+            <div class="farmer-name-en" id="out-name-en">Ramnaresh Chaudhari</div>
+            <div class="farmer-name-hi" id="out-name-hi">रामनरेश चौधरी</div>
+
+            <div class="detail-row">
+              <span class="detail-label">जन्म तिथि</span>
+              <span class="detail-colon">:</span>
+              <span class="detail-value" id="out-dob">01/01/1927</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">लिंग</span>
+              <span class="detail-colon">:</span>
+              <span class="detail-value" id="out-gender">Male</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">मोबाइल नंबर</span>
+              <span class="detail-colon">:</span>
+              <span class="detail-value" id="out-mobile">7070393730</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">राज्य</span>
+              <span class="detail-colon">:</span>
+              <span class="detail-value" id="out-state">BIHAR</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">जिला</span>
+              <span class="detail-colon">:</span>
+              <span class="detail-value" id="out-district">SAMASTIPUR</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">किसान ID</span>
+              <span class="detail-colon">:</span>
+              <span class="detail-value" id="out-farmer-id-row">36565207294</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">आधार नंबर</span>
+              <span class="detail-colon">:</span>
+              <span class="detail-value" id="out-aadhar">[Aadhaar Redacted]</span>
+            </div>
+          </div>
+
+          <div class="qr-box">
+            <div class="qr-code-container" id="qrcode"></div>
+          </div>
+        </div>
+
+        <div class="front-bottom">
+          <!-- Leaf Graphic Bottom Left -->
+          <svg class="leaf-graphic-left" viewBox="0 0 80 80" fill="none">
+            <path d="M5 75 C 20 40, 50 30, 75 25 C 45 45, 30 60, 5 75 Z" fill="#22c55e"/>
+            <path d="M0 80 C 15 50, 40 40, 60 35 C 35 55, 20 70, 0 80 Z" fill="#15803d"/>
+          </svg>
+
+          <div class="pill-id-box">
+            <div class="pill-icon"><i class="fa-solid fa-user"></i></div>
+            <div class="pill-text">Farmer ID : <span id="out-farmer-id-pill">36565207294</span></div>
+          </div>
+
+          <div class="tagline-bar">
+            समृद्ध किसान, समृद्ध भारत
+          </div>
+        </div>
+      </div>
+
+      <!-- ================= BACK SIDE (9cm x 6cm) ================= -->
+      <div class="card-side back">
+        <div class="back-header">
+          <div class="back-header-title">Farmer Enrollment Id</div>
+          <div class="back-header-id" id="out-enroll-id">10_217_1284_236194_005001</div>
+        </div>
+
+        <div class="back-address">
+          Address .: <span id="out-address">yadu paran, ward no. 14, Kalyanpur, Samastipur, Bihar-848302</span>
+        </div>
+
+        <div class="land-details-title">
+          Land Ownership Details
+        </div>
+
+        <div class="table-container">
+          <table class="land-table" id="card-land-table">
+            <thead>
+              <tr>
+                <th style="width: 8%;">State</th>
+                <th style="width: 9%;">District</th>
+                <th style="width: 10%;">Sub Dist</th>
+                <th style="width: 28%;">Village Name</th>
+                <th style="width: 9%;">SNo.</th>
+                <th style="width: 20%;">Owner Name</th>
+                <th style="width: 16%;">Area (Ha)</th>
+              </tr>
+            </thead>
+            <tbody id="card-land-table-body">
+              <!-- Rendered via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<script>
+  let landRows = [
+    { subdist: 'Kalyanpur', village: 'Jadu Paran', sno: '215', area: '1.3333333E-4' }
+  ];
+
+  function renderLandForm() {
+    const tbody = document.getElementById('land-form-body');
+    tbody.innerHTML = '';
+    landRows.forEach((row, index) => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td><input type="text" value="${row.subdist}" oninput="updateLandData(${index}, 'subdist', this.value)"></td>
+        <td><input type="text" value="${row.village}" oninput="updateLandData(${index}, 'village', this.value)" style="width: 100%;"></td>
+        <td><input type="text" value="${row.sno}" oninput="updateLandData(${index}, 'sno', this.value)"></td>
+        <td><input type="text" value="${row.area}" oninput="updateLandData(${index}, 'area', this.value)"></td>
+        <td>${index > 0 ? `<button class="btn-danger" onclick="removeLandRow(${index})"><i class="fa-solid fa-trash"></i></button>` : ''}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+    updateCard();
+  }
+
+  function addLandRow() {
+    if (landRows.length >= 15) {
+      alert('Card max limit reached (15 rows).');
+      return;
+    }
+    landRows.push({ subdist: '', village: '', sno: '', area: '' });
+    renderLandForm();
+  }
+
+  function removeLandRow(index) {
+    landRows.splice(index, 1);
+    renderLandForm();
+  }
+
+  function updateLandData(index, field, value) {
+    landRows[index][field] = value;
+    updateCard();
+  }
+
+  function updateCard() {
+    // Front Form Values
+    const nameEn = document.getElementById('in-name-en').value;
+    const nameHi = document.getElementById('in-name-hi').value;
+    const dob = document.getElementById('in-dob').value;
+    const gender = document.getElementById('in-gender').value;
+    const mobile = document.getElementById('in-mobile').value;
+    const state = document.getElementById('in-state').value;
+    const district = document.getElementById('in-district').value;
+    const farmerId = document.getElementById('in-farmer-id').value;
+    const aadhar = document.getElementById('in-aadhar').value;
+
+    // Back Form Values
+    const enrollId = document.getElementById('in-enroll-id').value;
+    const address = document.getElementById('in-address').value;
+
+    // Render Front Card
+    document.getElementById('out-name-en').innerText = nameEn || 'N/A';
+    document.getElementById('out-name-hi').innerText = nameHi || 'N/A';
+    document.getElementById('out-dob').innerText = dob || 'N/A';
+    document.getElementById('out-gender').innerText = gender || 'N/A';
+    document.getElementById('out-mobile').innerText = mobile || 'N/A';
+    document.getElementById('out-state').innerText = state || 'N/A';
+    document.getElementById('out-district').innerText = district || 'N/A';
+    document.getElementById('out-farmer-id-row').innerText = farmerId || 'N/A';
+    document.getElementById('out-aadhar').innerText = aadhar || 'N/A';
+    document.getElementById('out-farmer-id-pill').innerText = farmerId || 'N/A';
+
+    // Render Back Card Header & Address
+    document.getElementById('out-enroll-id').innerText = enrollId || 'N/A';
+    document.getElementById('out-address').innerText = address || 'N/A';
+
+    // Render Back Card Land Table
+    const cardTable = document.getElementById('card-land-table');
+    const cardTbody = document.getElementById('card-land-table-body');
+    cardTbody.innerHTML = '';
+
+    // Precise scaling to maximize readability & fill card bottom completely
+    const rowCount = landRows.length;
+    let fontSize = '6.5px';
+    let cellPadding = '3px 1px';
+
+    if (rowCount > 10) {
+      fontSize = '4px';
+      cellPadding = '0.8px 0.2px';
+    } else if (rowCount > 7) {
+      fontSize = '4.8px';
+      cellPadding = '1.2px 0.4px';
+    } else if (rowCount > 4) {
+      fontSize = '5.5px';
+      cellPadding = '2px 0.6px';
+    }
+
+    cardTable.style.fontSize = fontSize;
+
+    landRows.forEach(row => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td style="padding: ${cellPadding}">${state || '-'}</td>
+        <td style="padding: ${cellPadding}">${district || '-'}</td>
+        <td style="padding: ${cellPadding}">${row.subdist || '-'}</td>
+        <td style="padding: ${cellPadding}; font-weight: 800;">${row.village || '-'}</td>
+        <td style="padding: ${cellPadding}">${row.sno || '-'}</td>
+        <td style="padding: ${cellPadding}">${nameHi || '-'}</td>
+        <td style="padding: ${cellPadding}">${row.area || '-'}</td>
+      `;
+      cardTbody.appendChild(tr);
+    });
+
+    // Fill remaining space with clean empty rows if total rows are less than 6
+    const minRowsToFill = 6;
+    if (rowCount < minRowsToFill) {
+      for (let i = rowCount; i < minRowsToFill; i++) {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td style="padding: ${cellPadding}">&nbsp;</td><td></td><td></td><td></td><td></td><td></td><td></td>`;
+        cardTbody.appendChild(tr);
+      }
+    }
+
+    // Dynamic QR Code generation with Pushkar Digital Solutions shop tag
+    const qrData = `AGRI FARMER CARD\nGenerated By: Pushkar Digital Solutions\nName: ${nameEn}\nDOB: ${dob}\nMobile: ${mobile}\nFarmer ID: ${farmerId}\nAadhar: ${aadhar}\nDistrict: ${district}, ${state}`;
+    
+    const qrContainer = document.getElementById('qrcode');
+    qrContainer.innerHTML = '';
+    
+    new QRCode(qrContainer, {
+      text: qrData,
+      width: 60,
+      height: 60,
+      colorDark : "#000000",
+      colorLight : "#ffffff",
+      correctLevel : QRCode.CorrectLevel.M
+    });
+  }
+
+  function loadPhoto(event) {
+    const reader = new FileReader();
+    reader.onload = function(){
+      const output = document.getElementById('out-photo');
+      output.src = reader.result;
+    };
+    if (event.target.files[0]) {
+      reader.readAsDataURL(event.target.files[0]);
+    }
+  }
+
+  // Initial Load
+  window.onload = function() {
+    renderLandForm();
+  };
+</script>
+
+</body>
+</html>
