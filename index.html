@@ -506,7 +506,7 @@
         
         <div class="search-container">
             <i class="fa-solid fa-magnifying-glass search-icon"></i>
-            <input type="text" id="searchInput" class="search-input" placeholder="Search any service or tool (e.g. Crop, Aadhaar, Potato, BizNext)..." onkeyup="filterTools()">
+            <input type="text" id="searchInput" class="search-input" placeholder="Search any service or tool (e.g. Kisan, Crop, Aadhaar, Potato)..." onkeyup="filterTools()">
         </div>
     </section>
 
@@ -519,6 +519,19 @@
         </div>
         
         <div class="tools-grid">
+            <!-- Featured Kisan / Agri Card Generator Tool Card -->
+            <div class="tool-card featured">
+                <span class="featured-badge" style="background: #10b981;">Farmer Special</span>
+                <div class="tool-icon" style="background: #dcfce7; color: #0a5223;">
+                    <i class="fa-solid fa-id-card"></i>
+                </div>
+                <div class="tool-title">Agri Card / Kisan ID Generator</div>
+                <div class="tool-desc">18cm x 6cm size me instant Kisan ID card aur khet ki details print karein.</div>
+                <button class="btn-action" onclick="openToolModal('kissancard.html', 'Agri Card / Kisan ID Generator Studio')">
+                    <i class="fa-solid fa-arrow-up-right-from-square"></i> Open Tool Now
+                </button>
+            </div>
+
             <!-- Featured Custom HTML Crop Tool Card -->
             <div class="tool-card featured">
                 <span class="featured-badge">Shop Special</span>
@@ -527,7 +540,7 @@
                 </div>
                 <div class="tool-title">Document Crop & Editor</div>
                 <div class="tool-desc">Upload, crop, resize and adjust document dimensions directly for printing.</div>
-                <button class="btn-action" onclick="openToolModal()">
+                <button class="btn-action" onclick="openToolModal('idcroptool.html', 'Document Crop & Editing Studio')">
                     <i class="fa-solid fa-arrow-up-right-from-square"></i> Open Tool Now
                 </button>
             </div>
@@ -679,35 +692,38 @@
 
     </div>
 
-    <!-- Modal Box (Opens idcroptool.html dynamically) -->
+    <!-- Modal Box (Opens tools dynamically inside popup) -->
     <div id="toolModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3><i class="fa-solid fa-crop-simple"></i> Document Crop & Editing Studio</h3>
+                <h3 id="modalTitle"><i class="fa-solid fa-toolbox"></i> Online Studio</h3>
                 <button class="close-btn" onclick="closeToolModal()">&times;</button>
             </div>
             <div class="modal-body">
-                <iframe src="idcroptool.html"></iframe>
+                <iframe id="modalIframe" src=""></iframe>
             </div>
         </div>
     </div>
 
     <!-- JavaScript Logic -->
     <script>
-        // Modal Open/Close Logic
-        function openToolModal() {
+        // Dynamic Modal Open/Close Logic
+        function openToolModal(pageUrl, titleText) {
+            document.getElementById('modalIframe').src = pageUrl;
+            document.getElementById('modalTitle').innerHTML = '<i class="fa-solid fa-toolbox"></i> ' + titleText;
             document.getElementById('toolModal').style.display = 'flex';
         }
 
         function closeToolModal() {
             document.getElementById('toolModal').style.display = 'none';
+            document.getElementById('modalIframe').src = '';
         }
 
         // Close modal if clicked outside content box
         window.onclick = function(event) {
             let modal = document.getElementById('toolModal');
             if (event.target == modal) {
-                modal.style.display = "none";
+                closeToolModal();
             }
         }
 
